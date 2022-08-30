@@ -1,7 +1,7 @@
 import os
 
 import paddle
-from paddle.utils.cpp_extension import BuildExtension, CUDAExtension, setup
+from paddle.utils.cpp_extension import CUDAExtension, setup
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -73,9 +73,6 @@ if paddle.device.is_compiled_with_cuda():
 	nvcc_flags += definitions
 	cflags += definitions
 
-	# Some containers set this to contain old architectures that won't compile. We only need the one installed in the machine.
-	os.environ["TORCH_CUDA_ARCH_LIST"] = ""
-
 	# List of sources.
 	bindings_dir = os.path.dirname(__file__)
 	root_dir = os.path.abspath(os.path.join(bindings_dir, "../.."))
@@ -137,10 +134,9 @@ setup(
 	],
 	url="https://github.com/nvlabs/tiny-cuda-nn",
 	license="BSD 3-Clause \"New\" or \"Revised\" License",
-	packages=["tinycudann"],
+	# packages=["tinycudann"],
 	install_requires=[],
 	include_package_data=True,
 	zip_safe=False,
 	ext_modules=ext_modules,
-	cmdclass={"build_ext": BuildExtension}
 )
