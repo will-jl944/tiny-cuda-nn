@@ -297,7 +297,7 @@ Module create_encoding(uint32_t n_input_dims, const nlohmann::json& encoding, tc
 	return Module{tcnn::cpp::create_encoding(n_input_dims, encoding, requested_precision)};
 }
 
-PYBIND11_MODULE("tinycudann", m) {
+PYBIND11_MODULE(tinycudann, m) {
 	py::enum_<tcnn::cpp::EPrecision>(m, "Precision")
 		.value("Fp32", tcnn::cpp::EPrecision::Fp32)
 		.value("Fp16", tcnn::cpp::EPrecision::Fp16)
