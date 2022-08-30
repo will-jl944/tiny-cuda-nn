@@ -211,12 +211,12 @@ public:
 
 		paddle::Tensor dL_dparams;
 		if (params_requires_grad) {
-			dL_dparams = paddle::zeros({ n_params() }, c10_param_precision(), place);
+			dL_dparams = paddle::full({ n_params() }, 0, c10_param_precision(), place);
 		}
 
 		paddle::Tensor dL_dinput;
 		if (input_requires_grad) {
-			dL_dinput = paddle::zeros({ batch_size, n_input_dims() }, paddle::DataType::FLOAT32, place);
+			dL_dinput = paddle::full({ batch_size, n_input_dims() }, 0, paddle::DataType::FLOAT32, place);
 		}
 
 		if (dL_doutput_requires_grad || params_requires_grad) {
@@ -238,7 +238,7 @@ public:
 	}
 
 	paddle::Tensor initial_params(size_t seed) {
-		paddle::Tensor output = paddle::zeros({ n_params() }, paddle::DataType::FLOAT32, paddle::GPUPlace());
+		paddle::Tensor output = paddle::full({ n_params() }, 0, paddle::DataType::FLOAT32, paddle::GPUPlace());
 		m_module->initialize_params(seed, output.data<float>());
 		return output;
 	}
