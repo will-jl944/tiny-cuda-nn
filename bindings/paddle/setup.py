@@ -41,7 +41,7 @@ if paddle.device.is_compiled_with_cuda():
 				raise RuntimeError("Could not locate a supported Microsoft Visual C++ installation")
 			os.environ["PATH"] += ";" + cl_path
 
-	major, minor = paddle.cuda.get_device_capability()
+	major, minor = paddle.device.cuda.get_device_capability()
 	compute_capability = major * 10 + minor
 
 	nvcc_flags = [
