@@ -1,8 +1,7 @@
 import os
 
 import paddle
-from setuptools import setup
-from paddle.utils.cpp_extension import BuildExtension, CUDAExtension
+from paddle.utils.cpp_extension import BuildExtension, CUDAExtension, setup
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
