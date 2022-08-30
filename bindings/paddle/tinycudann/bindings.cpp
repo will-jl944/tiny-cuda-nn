@@ -35,7 +35,7 @@
 #include <paddle/extension.h>
 #endif
 
-#include <c10/cuda/CUDAGuard.h>
+//#include <c10/cuda/CUDAGuard.h>
 
 #ifdef snprintf
 #undef snprintf
@@ -53,7 +53,7 @@
 #define CHECK_THROW(x) \
 	do { if (!(x)) throw std::runtime_error(std::string(FILE_LINE " check failed " #x)); } while(0)
 
-c10::ScalarType paddle_type(tcnn::cpp::EPrecision precision) {
+paddle::DataType paddle_type(tcnn::cpp::EPrecision precision) {
 	switch (precision) {
 		case tcnn::cpp::EPrecision::Fp32: return paddle::DataType::FLOAT32;
 		case tcnn::cpp::EPrecision::Fp16: return paddle::DataType::FLOAT16;
@@ -84,8 +84,8 @@ public:
 		CHECK_THROW(params.dtype() == c10_param_precision());
 
 		// Sizes
-		CHECK_THROW(input.shape[1] == n_input_dims());
-		CHECK_THROW(params.shape[0] == n_params());
+		CHECK_THROW(input.shape()[1] == n_input_dims());
+		CHECK_THROW(params.shape()[0] == n_params());
 
 		// Device
 		auto place = input.place();
@@ -93,7 +93,7 @@ public:
 
 		cudaStream_t stream = input.stream();
 
-		uint32_t batch_size = static_cast<uint32_t>(input.shape[0]);
+		uint32_t batch_size = static_cast<uint32_t>(input.shape()[0]);
 
 		paddle::Tensor output = paddle.empty({ batch_size, n_output_dims() }, c10_output_precision(), place);
 
@@ -124,11 +124,11 @@ public:
 		CHECK_THROW(dL_doutput.dtype() == c10_output_precision());
 
 		// Sizes
-		CHECK_THROW(input.shape[1] == n_input_dims());
-		CHECK_THROW(output.shape[1] == n_output_dims());
-		CHECK_THROW(params.shape[0] == n_params());
-		CHECK_THROW(output.shape[0] == input.shape[0]);
-		CHECK_THROW(dL_doutput.shape[0] == input.shape[0]);
+		CHECK_THROW(input.shape()[1] == n_input_dims());
+		CHECK_THROW(output.shape()[1] == n_output_dims());
+		CHECK_THROW(params.shape()[0] == n_params());
+		CHECK_THROW(output.shape()[0] == input.shape()[0]);
+		CHECK_THROW(dL_doutput.shape()[0] == input.shape()[0]);
 
 		// Device
 		auto place = input.place();
@@ -138,11 +138,11 @@ public:
 
 		cudaStream_t stream = input.stream();
 
-		uint32_t batch_size = static_cast<uint32_t>(input.shape[0]);
+		uint32_t batch_size = static_cast<uint32_t>(input.shape()[0]);
 
 		paddle::Tensor dL_dinput;
 		if (input_requires_grad) {
-			dL_dinput = paddle::empty({ batch_size, input.shape[1] }, paddle::DataType::FLOAT32, place);
+			dL_dinput = paddle::empty({ batch_size, input.shape()[1] }, paddle::DataType::FLOAT32, place);
 		}
 
 		paddle::Tensor dL_dparams;
@@ -187,12 +187,12 @@ public:
 		CHECK_THROW(dL_doutput.dtype() == c10_output_precision());
 
 		// Sizes
-		CHECK_THROW(input.shape[1] == n_input_dims());
-		CHECK_THROW(dL_doutput.shape[1] == n_output_dims());
-		CHECK_THROW(dL_ddLdinput.shape[1] == n_input_dims());
-		CHECK_THROW(params.shape[0] == n_params());
-		CHECK_THROW(dL_doutput.shape[0] == input.shape[0]);
-		CHECK_THROW(dL_ddLdinput.shape[0] == input.shape[0]);
+		CHECK_THROW(input.shape()[1] == n_input_dims());
+		CHECK_THROW(dL_doutput.shape()[1] == n_output_dims());
+		CHECK_THROW(dL_ddLdinput.shape()[1] == n_input_dims());
+		CHECK_THROW(params.shape()[0] == n_params());
+		CHECK_THROW(dL_doutput.shape()[0] == input.shape()[0]);
+		CHECK_THROW(dL_ddLdinput.shape()[0] == input.shape()[0]);
 
 		// Device
 		auto place = input.place();
@@ -202,11 +202,11 @@ public:
 
 		cudaStream_t stream = input.stream();
 
-		uint32_t batch_size = static_cast<uint32_t>(input.shape[0]);
+		uint32_t batch_size = static_cast<uint32_t>(input.shape()[0]);
 
 		paddle::Tensor dL_ddLdoutput;
 		if (dL_doutput_requires_grad) {
-			dL_ddLdoutput = paddle::zeros({ batch_size, n_output_dims() }, c10_output_precision(), place);
+			dL_ddLdoutput = paddle::full({ batch_size, n_output_dims() }, 0, c10_output_precision(), place);
 		}
 
 		paddle::Tensor dL_dparams;
@@ -255,7 +255,7 @@ public:
 		return m_module->param_precision();
 	}
 
-	c10::ScalarType c10_param_precision() const {
+	paddle::DataType c10_param_precision() const {
 		return paddle_type(param_precision());
 	}
 
@@ -267,7 +267,7 @@ public:
 		return m_module->output_precision();
 	}
 
-	c10::ScalarType c10_output_precision() const {
+	paddle::DataType c10_output_precision() const {
 		return paddle_type(output_precision());
 	}
 
