@@ -89,13 +89,13 @@ public:
 
 		// Device
 		auto place = input.place();
-		CHECK_THROW(device == params.place());
+		CHECK_THROW(place == params.place());
 
 		cudaStream_t stream = input.stream();
 
 		uint32_t batch_size = static_cast<uint32_t>(input.shape()[0]);
 
-		paddle::Tensor output = paddle.empty({ batch_size, n_output_dims() }, c10_output_precision(), place);
+		paddle::Tensor output = paddle::empty({ batch_size, n_output_dims() }, c10_output_precision(), place);
 
 		tcnn::cpp::Context ctx;
 		if (!input_requires_grad && !params_requires_grad) {
@@ -297,7 +297,7 @@ Module create_encoding(uint32_t n_input_dims, const nlohmann::json& encoding, tc
 	return Module{tcnn::cpp::create_encoding(n_input_dims, encoding, requested_precision)};
 }
 
-PYBIND11_MODULE(tinycudann, m) {
+PYBIND11_MODULE("tinycudann", m) {
 	py::enum_<tcnn::cpp::EPrecision>(m, "Precision")
 		.value("Fp32", tcnn::cpp::EPrecision::Fp32)
 		.value("Fp16", tcnn::cpp::EPrecision::Fp16)
